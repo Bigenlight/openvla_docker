@@ -1,0 +1,46 @@
+# Standalone compose for the OpenVLA HTTP VLA server.
+#
+# Usage (from the openvla repo root):
+#
+#   # Protocol smoke-test — no checkpoint required:
+#   OPENVLA_HTTP_ARGS="--dummy" \
+#     docker compose -f scripts/docker/openvla_http_compose.yml up --build
+#
+#   # Real checkpoint (downloaded to ~/.cache/huggingface on first run, ~15 GB):
+#   docker compose -f scripts/docker/openvla_http_compose.yml up --build
+#
+#   # Non-Ampere GPU / flash-attn unavailable:
+#   OPENVLA_HTTP_ARGS="--attn-impl sdpa" \
+#     docker compose -f scripts/docker/openvla_http_compose.yml up
+#
+# The server listens on host port 8600 (network_mode: host) so that any other
+# container on the same machine can reach it at http://localhost:8600.
+
+services:
+  openvla_http:
+    image: openvla-http:latest
+    build:
+      context: ../..
+      dockerfile: scripts/docker/serve_openvla_http.Dockerfile
+    init: true
+    tty: true
+    network_mode: host
+    # Source code is bind-mounted so the host's openvla repo stays the source
+    # of truth (enables `git pull/push` without rebuilding the image). The HF
+    # cache mount makes the 7B checkpoint a one-time download.
+    volumes:
+      - ../..:/app
+      - ${HF_HOME:-${HOME}/.cache/huggingface}:/hf_cache
+    environment:
+      - OPENVLA_HTTP_ARGS=${OPENVLA_HTTP_ARGS:-}
+      - OPENVLA_HTTP_PORT=${OPENVLA_HTTP_PORT:-8600}
+      - HF_HOME=/hf_cache
+      - TRANSFORMERS_CACHE=/hf_cache
+      - IS_DOCKER=true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
