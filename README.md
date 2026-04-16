@@ -1,4 +1,41 @@
-# OpenVLA: An Open-Source Vision-Language-Action Model
+# OpenVLA Docker — Dockerized HTTP Inference Server for LIBERO Benchmarks
+
+> **This is a fork of [openvla/openvla](https://github.com/openvla/openvla).**
+> Docker 컨테이너 + HTTP 서버로 패키징하여 LIBERO / LIBERO-PRO 벤치마크와 통합 프로토콜로 통신합니다.
+> 원본 README는 아래에 그대로 유지되어 있습니다.
+
+### Fork 추가 문서
+
+| 문서 | 내용 |
+|------|------|
+| [README_DOCKER.md](README_DOCKER.md) | Docker 설치 가이드, 모델 다운로드, Quick Start, LIBERO 벤치마크 실행, 결과(74%), 트러블슈팅 |
+| [PROTOCOL_AND_ARCHITECTURE.md](PROTOCOL_AND_ARCHITECTURE.md) | 통신 규약 상세, JSON 스키마, 아키텍처 다이어그램, 10단계 데이터 흐름, 코드 경로 매핑, Pi0.5 비교, HTTP 지연 측정 |
+
+### Fork 추가 파일
+
+| 경로 | 설명 |
+|------|------|
+| `scripts/serve_openvla_http.py` | FastAPI HTTP 서버 (포트 8600) |
+| `scripts/docker/serve_openvla_http.Dockerfile` | deps-only Docker 이미지 |
+| `scripts/docker/openvla_http_compose.yml` | Docker Compose (소스 + HF 캐시 마운트) |
+| `scripts/docker/openvla_http_entrypoint.sh` | 컨테이너 entrypoint |
+| `scripts/benchmark_latency.py` | HTTP 오버헤드 측정 도구 |
+| `scripts/benchmark_latency_stress.py` | 스트레스 테스트 (멀티캠, 해상도, 동시요청) |
+
+### Quick Start
+
+```bash
+docker pull bigenlight/openvla-http:latest
+git clone git@github.com:Bigenlight/openvla_docker.git && cd openvla_docker
+docker compose -f scripts/docker/openvla_http_compose.yml up
+curl http://localhost:8600/health
+```
+
+자세한 내용은 [README_DOCKER.md](README_DOCKER.md)를 참고하세요.
+
+---
+
+# OpenVLA: An Open-Source Vision-Language-Action Model (Original README)
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.09246-df2a2a.svg?style=for-the-badge)](https://arxiv.org/abs/2406.09246)
 [![HF Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow?style=for-the-badge)](https://huggingface.co/openvla/openvla-7b)
