@@ -1,6 +1,14 @@
 # OpenVLA Docker — Dockerized HTTP Inference Server for LIBERO Benchmarks
 
-> **This is a fork of [openvla/openvla](https://github.com/openvla/openvla).**
+> **⚠️ 이 브랜치(`main`)는 [openvla/openvla](https://github.com/openvla/openvla) 포크입니다.**
+> Bigenlight/openvla_docker 레포는 서로 다른 upstream의 두 코드베이스를 **브랜치로 분리**해서 관리합니다:
+>
+> | 브랜치 | Upstream | 모델 | Docker 이미지 | 포트 | LIBERO-Spatial 성공률 |
+> |--------|---------|------|---------------|------|----------------------|
+> | **`main`** (이 브랜치) | [openvla/openvla](https://github.com/openvla/openvla) | OpenVLA (vanilla, 7B) | `bigenlight/openvla-http` | 8600 | 74% (37/50) |
+> | [`oft`](../../tree/oft) | [moojink/openvla-oft](https://github.com/moojink/openvla-oft) | OpenVLA-OFT (7B + OFT recipe) | `bigenlight/openvla-oft-http` | 8700 | **96% (48/50)** |
+>
+> 두 브랜치는 **unrelated histories**입니다 — 코드베이스가 다르므로 `git merge`하면 안 됩니다.
 > Docker 컨테이너 + HTTP 서버로 패키징하여 LIBERO / LIBERO-PRO 벤치마크와 통합 프로토콜로 통신합니다.
 > 원본 README는 아래에 그대로 유지되어 있습니다.
 
