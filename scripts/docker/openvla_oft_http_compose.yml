@@ -1,0 +1,41 @@
+# Standalone compose for the OpenVLA-OFT HTTP VLA server.
+#
+# Usage (from the openvla-oft repo root):
+#
+#   # Protocol smoke-test — no checkpoint required:
+#   OPENVLA_OFT_HTTP_ARGS="--dummy" \
+#     docker compose -f scripts/docker/openvla_oft_http_compose.yml up --build
+#
+#   # Real checkpoint (downloaded to ~/.cache/huggingface on first run, ~15.9 GB):
+#   docker compose -f scripts/docker/openvla_oft_http_compose.yml up --build
+#
+# Listens on host port 8700 (network_mode: host) so benchmark containers can
+# reach it at http://localhost:8700.
+
+services:
+  openvla_oft_http:
+    image: openvla-oft-http:latest
+    build:
+      context: ../..
+      dockerfile: scripts/docker/serve_openvla_oft_http.Dockerfile
+    init: true
+    tty: true
+    network_mode: host
+    volumes:
+      - ../..:/app
+      - ${HF_HOME:-${HOME}/.cache/huggingface}:/hf_cache
+    environment:
+      - OPENVLA_OFT_HTTP_ARGS=${OPENVLA_OFT_HTTP_ARGS:-}
+      - OPENVLA_OFT_HTTP_PORT=${OPENVLA_OFT_HTTP_PORT:-8700}
+      - HF_HOME=/hf_cache
+      - TRANSFORMERS_CACHE=/hf_cache
+      - HF_HUB_DISABLE_XET=1
+      - HF_HUB_ENABLE_HF_TRANSFER=0
+      - IS_DOCKER=true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

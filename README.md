@@ -1,4 +1,47 @@
-# Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success
+# OpenVLA-OFT Docker — Dockerized HTTP Inference Server for LIBERO Benchmarks
+
+> **This is a fork of [moojink/openvla-oft](https://github.com/moojink/openvla-oft).**
+> Docker 컨테이너 + HTTP 서버로 패키징하여 LIBERO / LIBERO-PRO 벤치마크와 통합 프로토콜로 통신합니다.
+> 원본 README는 아래에 그대로 유지되어 있습니다.
+
+### Fork 추가 문서
+
+| 문서 | 내용 |
+|------|------|
+| [README_DOCKER.md](README_DOCKER.md) | Docker 설치 가이드, 모델 다운로드, Quick Start, LIBERO 벤치마크 실행, 결과(96%), 트러블슈팅 (xet hang 포함) |
+| [PROTOCOL_AND_ARCHITECTURE.md](PROTOCOL_AND_ARCHITECTURE.md) | 통신 규약 상세, JSON 스키마, 아키텍처 다이어그램, 11단계 데이터 흐름, 코드 경로 매핑, OpenVLA/OFT/Pi0.5 3자 비교, 지연 분석 |
+
+### Fork 추가 파일
+
+| 경로 | 설명 |
+|------|------|
+| `scripts/serve_openvla_oft_http.py` | FastAPI HTTP 서버 (포트 **8700**) |
+| `scripts/docker/serve_openvla_oft_http.Dockerfile` | deps-only Docker 이미지 (moojink transformers fork 포함) |
+| `scripts/docker/openvla_oft_http_compose.yml` | Docker Compose (소스 + HF 캐시 마운트, xet 비활성화) |
+| `scripts/docker/openvla_oft_http_entrypoint.sh` | 컨테이너 entrypoint |
+| `prismatic/**/{__init__}.py` | lazy-import 패치 (inference 시 training deps 제거) |
+
+### Quick Start
+
+```bash
+docker pull bigenlight/openvla-oft-http:latest
+git clone git@github.com:Bigenlight/openvla-oft_docker.git && cd openvla-oft_docker
+docker compose -f scripts/docker/openvla_oft_http_compose.yml up
+curl http://localhost:8700/health
+```
+
+### 벤치마크 결과 (LIBERO-Spatial)
+
+| 모델 | 포트 | 성공률 (10 tasks × 5 trials) | 평균 latency/call | Effective per-step |
+|------|------|------------------------------|--------------------|---------------------|
+| OpenVLA (vanilla) | 8600 | 74% (37/50) | 260ms | 260ms |
+| **OpenVLA-OFT** | **8700** | **96% (48/50)** | **169ms** | **~21ms** (8 chunk) |
+
+자세한 내용은 [README_DOCKER.md](README_DOCKER.md)를 참고하세요.
+
+---
+
+# Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (Original README)
 
 **Project website: https://openvla-oft.github.io/**
 
